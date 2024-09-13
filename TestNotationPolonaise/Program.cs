@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TestNotationPolonaise
 {
@@ -45,13 +46,78 @@ namespace TestNotationPolonaise
         static float Polonaise(string formule)
         {
             String[] t = formule.Split(' ');
-            
-            for(int i=t.Length-1; i>=0; i--)
-            {
-                Console.Write(t[i]);
-            }
+            float[] tt = new float[t.Length];
+            float r = float.NaN;
+            int limit = 100;
 
-            return 1;
+            while (t.Length > 2 && limit > 1)
+            {
+                limit--;
+                for (int i = t.Length - 1; i >= 0; i--)
+                {
+                    try
+                    {
+                        tt[i] = float.Parse(t[i]);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            switch (t[i])
+                            {
+                                case "+":
+                                    r = float.Parse(t[i + 1]) + float.Parse(t[i + 2]); ;
+                                    t = supprimerCellule(t, i, r.ToString());
+                                    break;
+
+                                case "-":
+                                    r = float.Parse(t[i + 1]) - float.Parse(t[i + 2]);
+                                    t = supprimerCellule(t, i, r.ToString());
+                                    break;
+
+                                case "*":
+                                    //r = tt[i + 1] * tt[i + 2];
+                                    r = float.Parse(t[i + 1]) * float.Parse(t[i + 2]);
+                                    t = supprimerCellule(t, i, r.ToString());
+                                    break;
+
+                                case "/":
+                                    //Pas toucher !
+                                    r = float.Parse(t[i + 1]) / float.Parse(t[i + 2]);
+                                    t = supprimerCellule(t, i, r.ToString());
+                                    break;
+
+                                default:
+                                    //Console.Write("Non");
+                                    break;
+
+                            }
+                        }
+                        catch
+                        {
+                            limit = 0;
+                            r = float.NaN;
+                        }
+                    }
+                }
+            }
+            return r;
+        }
+
+        static String[] supprimerCellule(String[] tableau, int numeroCase, String result)
+        {
+            // Utilisation d'une List pour faciliter les modifications
+            List<String> ls = new List<String>(tableau);
+
+            // Remplacer l'opérateur par le résultat de l'opération
+            ls[numeroCase] = result;
+
+            // Supprimer les deux opérandes (situées juste après l'opérateur)
+            ls.RemoveAt(numeroCase + 1);  // Suppression de l'opérande 1
+            ls.RemoveAt(numeroCase + 1);  // Suppression de l'opérande 2 (la position est toujours numeroCase + 1 car le tableau se décale après la première suppression)
+
+            // Conversion de la List en tableau avant de retourner
+            return ls.ToArray();
         }
     }
 }
